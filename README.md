@@ -1,6 +1,8 @@
 # Hourglass
 
-A small work-progress app I built with the MERN stack idea in mind.
+A small work-progress app I made for fun / entertainment.
+
+I didn’t hand-write this whole thing myself — I built it **completely with AI** (Cursor). I asked for features, tested them, and steered what I wanted. So treat it as an AI-assisted side project, not as proof that I wrote every line from scratch.
 
 It’s not a countdown timer. The hourglass shows how much work I’ve finished on a project. I hold **POUR** when I’m working, and the sand fills up as progress.
 
