@@ -1,0 +1,97 @@
+.done-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: transparent;
+}
+
+.done-card {
+  position: fixed;
+  width: 260px;
+  max-height: min(360px, calc(100vh - 24px));
+  overflow: auto;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #2f261e, #1c1612);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  scrollbar-width: none;
+}
+
+.done-card::-webkit-scrollbar {
+  display: none;
+}
+
+.done-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--paper);
+}
+
+.done-hint {
+  margin: 4px 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.done-empty {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.done-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.done-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.done-tick {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(125, 154, 98, 0.25);
+  color: var(--ok);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.done-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.done-add {
+  display: flex;
+  gap: 6px;
+}
+
+.done-add input {
+  flex: 1;
+  min-width: 0;
+  background: #140f0c;
+  color: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 8px;
+}

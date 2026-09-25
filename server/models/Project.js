@@ -1,0 +1,26 @@
+import mongoose from "mongoose";
+
+const projectSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true, maxlength: 80 },
+    durationMs: { type: Number, required: true, min: 1 },
+    elapsedMs: { type: Number, required: true, min: 0, default: 0 },
+    completed: { type: Boolean, default: false },
+    important: { type: Boolean, default: false },
+    stars: { type: Number, min: 0, max: 5, default: 0 },
+    topics: {
+      type: [
+        {
+          id: { type: String, required: true },
+          text: { type: String, required: true, trim: true, maxlength: 80 },
+          done: { type: Boolean, default: true },
+        },
+      ],
+      default: [],
+    },
+    lastWorkedAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Project", projectSchema);

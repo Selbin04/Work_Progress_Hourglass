@@ -1,0 +1,126 @@
+.daily-review-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 8, 6, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.daily-review-card {
+  width: min(360px, 100%);
+  padding: 28px 24px 22px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #2f261e, #1a1511);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+
+.daily-review-eyebrow {
+  margin: 0 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.daily-review-card h2 {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  word-break: break-word;
+}
+
+.daily-review-meta {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.daily-review-stars {
+  margin: 10px 0 0;
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  color: var(--brass);
+}
+
+.daily-review-stars .off {
+  color: rgba(183, 165, 138, 0.28);
+}
+
+.daily-review-glass {
+  position: relative;
+  width: 36px;
+  height: 56px;
+  margin: 18px auto 0;
+  border: 1px solid var(--line);
+  border-radius: 4px 4px 10px 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.daily-review-sand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, var(--sand), var(--brass-deep));
+}
+
+.daily-review-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.daily-review-previous,
+.daily-review-select {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.daily-review-previous {
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--paper);
+}
+
+.daily-review-previous:hover:not(:disabled) {
+  border-color: var(--brass);
+  background: rgba(212, 177, 90, 0.12);
+}
+
+.daily-review-previous:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.daily-review-select {
+  border: 1px solid var(--brass);
+  background: linear-gradient(180deg, rgba(212, 177, 90, 0.28), rgba(138, 100, 24, 0.35));
+  color: var(--paper);
+}
+
+.daily-review-select:hover {
+  background: linear-gradient(180deg, rgba(212, 177, 90, 0.4), rgba(138, 100, 24, 0.5));
+}
+
+.daily-review-hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}

@@ -1,0 +1,140 @@
+.today-works-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 8, 6, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.today-works-card {
+  width: min(400px, 100%);
+  max-height: min(520px, calc(100vh - 40px));
+  overflow: auto;
+  padding: 24px 22px 20px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #2f261e, #1a1511);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  scrollbar-width: none;
+}
+
+.today-works-card::-webkit-scrollbar {
+  display: none;
+}
+
+.today-works-eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+  text-align: center;
+}
+
+.today-works-card h2 {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  word-break: break-word;
+}
+
+.today-works-hint {
+  margin: 8px 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.today-works-empty {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.45;
+}
+
+.today-works-list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.today-works-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--paper);
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.today-works-item.is-on {
+  border-color: var(--brass);
+  background: rgba(212, 177, 90, 0.14);
+}
+
+.today-works-check {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--ok);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.today-works-item.is-on .today-works-check {
+  border-color: var(--brass);
+  background: rgba(125, 154, 98, 0.25);
+}
+
+.today-works-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.today-works-skip,
+.today-works-confirm {
+  padding: 12px 14px;
+  border-radius: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.today-works-skip {
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--paper);
+}
+
+.today-works-confirm {
+  border: 1px solid var(--brass);
+  background: linear-gradient(180deg, rgba(212, 177, 90, 0.28), rgba(138, 100, 24, 0.35));
+  color: var(--paper);
+}
+
+.today-works-confirm:hover {
+  background: linear-gradient(180deg, rgba(212, 177, 90, 0.4), rgba(138, 100, 24, 0.5));
+}

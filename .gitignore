@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+client/dist/
+
+# Secrets and personal project data
+server/.env
+server/data/
+server/data/projects.json
+
