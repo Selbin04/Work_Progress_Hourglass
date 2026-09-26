@@ -1,9 +1,19 @@
 .hourglass-svg {
-  width: min(320px, 72vw);
+  width: min(290px, 66vw);
   height: auto;
   display: block;
-  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.45));
-  transition: transform 0.4s ease;
+  transition: transform 0.35s ease;
+}
+
+[data-theme="light"] .hourglass-svg {
+  filter: contrast(1.08) saturate(1.05);
+}
+
+[data-theme="light"] .glass-wrap {
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #d8e8f5, #c5d9eb);
+  border: 1px solid #7aa8c8;
 }
 
 .hourglass-svg.is-pouring {
@@ -15,7 +25,7 @@
 }
 
 .sand-stream {
-  animation: stream-flicker 0.12s steps(2) infinite;
+  animation: stream-flicker 0.1s steps(2) infinite;
 }
 
 .done-stamp {
@@ -24,10 +34,12 @@
 
 @keyframes stream-flicker {
   0% {
-    opacity: 0.75;
+    opacity: 0.7;
+    transform: translateX(-0.3px);
   }
   100% {
     opacity: 1;
+    transform: translateX(0.3px);
   }
 }
 
@@ -37,17 +49,17 @@
     transform: rotate(0deg);
   }
   25% {
-    transform: rotate(-1.6deg);
+    transform: rotate(-1.4deg);
   }
   75% {
-    transform: rotate(1.6deg);
+    transform: rotate(1.4deg);
   }
 }
 
 @keyframes stamp-in {
   from {
     opacity: 0;
-    transform: scale(1.2);
+    transform: scale(1.15);
   }
   to {
     opacity: 1;

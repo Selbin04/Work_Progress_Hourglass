@@ -2,37 +2,55 @@ import { useEffect, useRef, useState } from "react";
 import "./Hourglass.css";
 
 const CX = 110;
-const TOP_Y = 58;
-const NECK_TOP = 196;
-const NECK_BOT = 216;
-const BOT_Y = 354;
-const MAX_HALF = 62;
-const MIN_HALF = 4.5;
+const TOP_Y = 64;
+const NECK_Y = 206;
+const BOT_Y = 348;
+const MAX_HALF = 58;
+const MIN_HALF = 3.2;
+
+/** Curved upper chamber outline (left → neck → right → top) */
+const TOP_BULB =
+  "M52 56 C52 56, 52 120, 107 200 C108.5 203, 111.5 203, 113 200 C168 120, 168 56, 168 56 C168 50, 162 46, 110 46 C58 46, 52 50, 52 56 Z";
+const BOT_BULB =
+  "M107 212 C108.5 209, 111.5 209, 113 212 C168 292, 168 356, 168 356 C168 362, 162 366, 110 366 C58 366, 52 362, 52 356 C52 356, 52 292, 107 212 Z";
 
 function topSandPath(progress) {
   const p = Math.min(1, Math.max(0, progress));
-  if (p >= 0.995) return "";
-  const t = p;
-  const y = TOP_Y + t * (NECK_TOP - TOP_Y);
+  if (p >= 0.992) return "";
+  const t = Math.pow(p, 0.92);
+  const y = TOP_Y + t * (NECK_Y - 10 - TOP_Y);
   const half = MAX_HALF * (1 - t) + MIN_HALF * t;
-  return `M ${CX - half} ${y} L ${CX + half} ${y} L ${CX + MIN_HALF} ${NECK_TOP} L ${CX - MIN_HALF} ${NECK_TOP} Z`;
+  const dip = 2 + (1 - t) * 5;
+  return `M ${CX - half} ${y}
+    Q ${CX} ${y + dip} ${CX + half} ${y}
+    L ${CX + MIN_HALF} ${NECK_Y - 6}
+    Q ${CX} ${NECK_Y - 2} ${CX - MIN_HALF} ${NECK_Y - 6}
+    Z`;
 }
 
 function bottomSandPath(progress) {
   const p = Math.min(1, Math.max(0, progress));
-  if (p <= 0.008) return "";
-  const peakY = BOT_Y - p * (BOT_Y - NECK_BOT);
-  const baseHalf = MAX_HALF * Math.min(1, 0.18 + p * 0.82);
-  return `M ${CX} ${peakY} L ${CX + baseHalf} ${BOT_Y} L ${CX - baseHalf} ${BOT_Y} Z`;
+  if (p <= 0.01) return "";
+  const mound = Math.pow(p, 0.85);
+  const peakY = BOT_Y - mound * (BOT_Y - NECK_Y - 14);
+  const baseHalf = MAX_HALF * Math.min(1, 0.22 + p * 0.78);
+  const shoulder = baseHalf * 0.72;
+  return `M ${CX} ${peakY}
+    C ${CX + shoulder * 0.35} ${peakY + 8}, ${CX + shoulder} ${BOT_Y - 18}, ${CX + baseHalf} ${BOT_Y}
+    L ${CX - baseHalf} ${BOT_Y}
+    C ${CX - shoulder} ${BOT_Y - 18}, ${CX - shoulder * 0.35} ${peakY + 8}, ${CX} ${peakY}
+    Z`;
 }
 
 function spawnGrain() {
   return {
     id: Math.random().toString(36).slice(2),
-    x: CX + (Math.random() - 0.5) * 6,
-    y: NECK_TOP - 2,
-    vy: 1.4 + Math.random() * 0.8,
-    r: 1.1 + Math.random() * 1.1,
+    x: CX + (Math.random() - 0.5) * 3.5,
+    y: NECK_Y - 8,
+    vx: (Math.random() - 0.5) * 0.35,
+    vy: 1.1 + Math.random() * 0.9,
+    r: 0.7 + Math.random() * 0.9,
+    life: 1,
   };
 }
 
@@ -57,19 +75,26 @@ export default function Hourglass({ progress, pouring, finished }) {
 
       if (pouringRef.current && progressRef.current < 1) {
         acc += dt;
-        while (acc > 42) {
-          acc -= 42;
-          next = [...next, spawnGrain(), spawnGrain()];
+        while (acc > 28) {
+          acc -= 28;
+          next = [...next, spawnGrain()];
+          if (Math.random() > 0.35) next = [...next, spawnGrain()];
         }
       } else {
         acc = 0;
       }
 
       next = next
-        .map((g) => ({ ...g, y: g.y + g.vy * (dt / 16), vy: g.vy + 0.08 }))
-        .filter((g) => g.y < BOT_Y - 8);
+        .map((g) => ({
+          ...g,
+          x: g.x + g.vx * (dt / 16),
+          y: g.y + g.vy * (dt / 16),
+          vy: g.vy + 0.12,
+          life: g.y > BOT_Y - 40 ? g.life - dt / 220 : g.life,
+        }))
+        .filter((g) => g.y < BOT_Y - 4 && g.life > 0);
 
-      if (next.length > 40) next = next.slice(next.length - 40);
+      if (next.length > 55) next = next.slice(next.length - 55);
 
       grainsRef.current = next;
       setGrains(next);
@@ -83,6 +108,7 @@ export default function Hourglass({ progress, pouring, finished }) {
   const topPath = topSandPath(progress);
   const botPath = bottomSandPath(progress);
   const remaining = Math.max(0, 1 - progress);
+  const topSurfaceY = TOP_Y + Math.pow(progress, 0.92) * (NECK_Y - 10 - TOP_Y);
 
   return (
     <svg
@@ -92,117 +118,182 @@ export default function Hourglass({ progress, pouring, finished }) {
       aria-label="Hourglass"
     >
       <defs>
-        <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f0d48a" />
-          <stop offset="45%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#7a5a12" />
+        <linearGradient id="capMetal" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8ad4ff" />
+          <stop offset="35%" stopColor="#2bb0ff" />
+          <stop offset="70%" stopColor="#0077c2" />
+          <stop offset="100%" stopColor="#0a3d66" />
         </linearGradient>
-        <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#4a2e18" />
-          <stop offset="50%" stopColor="#7a4a24" />
-          <stop offset="100%" stopColor="#3d2414" />
+        <linearGradient id="pillarMetal" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#1a222c" />
+          <stop offset="35%" stopColor="#4a5564" />
+          <stop offset="65%" stopColor="#2c3440" />
+          <stop offset="100%" stopColor="#12171e" />
         </linearGradient>
-        <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f3d089" />
-          <stop offset="55%" stopColor="#d4a017" />
-          <stop offset="100%" stopColor="#a56b0a" />
+        <linearGradient id="sandFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ffe2a0" />
+          <stop offset="40%" stopColor="#e8b85a" />
+          <stop offset="100%" stopColor="#c4892a" />
         </linearGradient>
-        <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="rgba(210,230,245,0.22)" />
-          <stop offset="50%" stopColor="rgba(160,190,210,0.06)" />
-          <stop offset="100%" stopColor="rgba(200,220,235,0.16)" />
+        <linearGradient id="sandLite" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+          <stop offset="45%" stopColor="rgba(255,240,200,0.35)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
         </linearGradient>
+        <radialGradient id="glassBody" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="rgba(170,210,240,0.55)" />
+          <stop offset="40%" stopColor="rgba(120,170,210,0.28)" />
+          <stop offset="100%" stopColor="rgba(70,120,170,0.32)" />
+        </radialGradient>
+        <linearGradient id="glassEdge" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#5a8fb8" />
+          <stop offset="45%" stopColor="#2f6f9e" />
+          <stop offset="100%" stopColor="#4a7fa8" />
+        </linearGradient>
+        <pattern id="grainNoise" width="6" height="6" patternUnits="userSpaceOnUse">
+          <circle cx="1" cy="2" r="0.6" fill="rgba(120,70,20,0.25)" />
+          <circle cx="4" cy="1" r="0.45" fill="rgba(255,255,255,0.2)" />
+          <circle cx="3" cy="4.5" r="0.5" fill="rgba(90,50,10,0.2)" />
+        </pattern>
+        <filter id="glassSoft" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="b" />
+          <feOffset dy="1" result="o" />
+          <feFlood floodColor="#000" floodOpacity="0.18" />
+          <feComposite in2="o" operator="in" />
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
         <clipPath id="top-bulb">
-          <path d="M48 52 L172 52 L114 196 L106 196 Z" />
+          <path d={TOP_BULB} />
         </clipPath>
         <clipPath id="bot-bulb">
-          <path d="M106 216 L114 216 L172 360 L48 360 Z" />
+          <path d={BOT_BULB} />
         </clipPath>
-        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000" floodOpacity="0.45" />
-        </filter>
       </defs>
 
-      <rect x="28" y="18" width="164" height="26" rx="5" fill="url(#wood)" filter="url(#soft)" />
-      <rect x="28" y="18" width="164" height="10" rx="5" fill="url(#brass)" opacity="0.85" />
-      <rect x="36" y="40" width="10" height="340" rx="3" fill="url(#wood)" />
-      <rect x="174" y="40" width="10" height="340" rx="3" fill="url(#wood)" />
-      <rect x="28" y="376" width="164" height="26" rx="5" fill="url(#wood)" />
-      <rect x="28" y="388" width="164" height="14" rx="5" fill="url(#brass)" opacity="0.7" />
+      {/* Frame — top cap */}
+      <rect x="34" y="22" width="152" height="22" rx="4" fill="url(#pillarMetal)" />
+      <rect x="34" y="20" width="152" height="12" rx="4" fill="url(#capMetal)" />
+      <rect x="42" y="24" width="8" height="8" rx="4" fill="#0a2a44" opacity="0.45" />
+      <rect x="170" y="24" width="8" height="8" rx="4" fill="#0a2a44" opacity="0.45" />
 
-      <path
-        d="M50 50 L170 50 L116 200 L104 200 Z"
-        fill="url(#glass)"
-        stroke="#cbb07a"
-        strokeWidth="2.2"
-      />
-      <path
-        d="M104 212 L116 212 L170 362 L50 362 Z"
-        fill="url(#glass)"
-        stroke="#cbb07a"
-        strokeWidth="2.2"
-      />
+      {/* Side pillars */}
+      <rect x="38" y="42" width="12" height="336" rx="3" fill="url(#pillarMetal)" />
+      <rect x="170" y="42" width="12" height="336" rx="3" fill="url(#pillarMetal)" />
+      <rect x="40" y="48" width="3" height="320" rx="1" fill="rgba(255,255,255,0.12)" />
+      <rect x="172" y="48" width="3" height="320" rx="1" fill="rgba(255,255,255,0.12)" />
 
+      {/* Bottom cap */}
+      <rect x="34" y="376" width="152" height="22" rx="4" fill="url(#pillarMetal)" />
+      <rect x="34" y="386" width="152" height="12" rx="4" fill="url(#capMetal)" />
+      <rect x="42" y="388" width="8" height="8" rx="4" fill="#0a2a44" opacity="0.45" />
+      <rect x="170" y="388" width="8" height="8" rx="4" fill="#0a2a44" opacity="0.45" />
+
+      {/* Glass chambers — dark outline first so shape reads on light bg */}
+      <path d={TOP_BULB} fill="none" stroke="#1a3a55" strokeWidth="4.5" opacity="0.35" />
+      <path d={BOT_BULB} fill="none" stroke="#1a3a55" strokeWidth="4.5" opacity="0.35" />
+      <path d={TOP_BULB} fill="url(#glassBody)" stroke="url(#glassEdge)" strokeWidth="2.8" filter="url(#glassSoft)" />
+      <path d={BOT_BULB} fill="url(#glassBody)" stroke="url(#glassEdge)" strokeWidth="2.8" filter="url(#glassSoft)" />
+
+      {/* Inner glass rim near neck */}
+      <ellipse cx={CX} cy={NECK_Y} rx="9" ry="4" fill="none" stroke="#3a6f98" strokeWidth="1.4" opacity="0.7" />
+
+      {/* Top sand */}
       <g clipPath="url(#top-bulb)">
-        {topPath && <path d={topPath} fill="url(#sand)" />}
-        {remaining > 0.02 && (
+        {topPath && (
+          <>
+            <path d={topPath} fill="url(#sandFill)" />
+            <path d={topPath} fill="url(#grainNoise)" opacity="0.55" />
+            <path d={topPath} fill="url(#sandLite)" opacity="0.4" />
+          </>
+        )}
+        {remaining > 0.03 && (
           <ellipse
             cx={CX}
-            cy={TOP_Y + progress * (NECK_TOP - TOP_Y) + 3}
+            cy={topSurfaceY + 2}
             rx={MAX_HALF * remaining + MIN_HALF}
-            ry={5 + remaining * 4}
-            fill="#e8c56a"
+            ry={3.5 + remaining * 3}
+            fill="#ffe9b8"
             opacity="0.55"
           />
         )}
       </g>
 
+      {/* Bottom sand mound */}
       <g clipPath="url(#bot-bulb)">
-        {botPath && <path d={botPath} fill="url(#sand)" />}
+        {botPath && (
+          <>
+            <path d={botPath} fill="url(#sandFill)" />
+            <path d={botPath} fill="url(#grainNoise)" opacity="0.5" />
+            <path d={botPath} fill="url(#sandLite)" opacity="0.35" />
+          </>
+        )}
       </g>
 
+      {/* Falling stream */}
       {pouring && progress < 1 && (
-        <rect
-          className="sand-stream"
-          x={CX - 2.2}
-          y={NECK_TOP - 4}
-          width="4.4"
-          height={NECK_BOT - NECK_TOP + 18}
-          rx="2"
-          fill="#e0b84a"
-        />
+        <g className="sand-stream">
+          <rect x={CX - 1.1} y={NECK_Y - 6} width="2.2" height="28" rx="1.1" fill="#e8b85a" opacity="0.95" />
+          <rect x={CX - 0.45} y={NECK_Y - 6} width="0.9" height="28" rx="0.45" fill="#fff0c8" opacity="0.7" />
+        </g>
       )}
 
       {grains.map((g) => (
-        <circle key={g.id} cx={g.x} cy={g.y} r={g.r} fill="#e8c56a" opacity="0.95" />
+        <circle
+          key={g.id}
+          cx={g.x}
+          cy={g.y}
+          r={g.r}
+          fill="#e0b04a"
+          opacity={Math.max(0.25, g.life)}
+        />
       ))}
 
+      {/* Specular highlights on glass */}
       <path
-        d="M58 58 C70 90, 88 140, 104 196"
+        d="M64 70 C72 110, 88 155, 104 198"
         fill="none"
-        stroke="rgba(255,255,255,0.28)"
-        strokeWidth="3"
+        stroke="rgba(255,255,255,0.65)"
+        strokeWidth="3.2"
         strokeLinecap="round"
       />
       <path
-        d="M62 330 C78 300, 92 250, 106 218"
+        d="M68 72 C76 108, 90 150, 103 196"
         fill="none"
-        stroke="rgba(255,255,255,0.16)"
-        strokeWidth="2.5"
+        stroke="rgba(80,130,180,0.35)"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M66 330 C80 295, 94 250, 106 218"
+        fill="none"
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M156 78 C148 120, 132 160, 116 198"
+        fill="none"
+        stroke="rgba(40,80,120,0.28)"
+        strokeWidth="2"
         strokeLinecap="round"
       />
 
-      <rect x="96" y="198" width="28" height="16" rx="3" fill="url(#brass)" />
-      <rect x="102" y="201" width="16" height="10" rx="2" fill="#3a2a10" opacity="0.5" />
+      {/* Neck collar */}
+      <rect x="98" y="198" width="24" height="16" rx="3" fill="url(#capMetal)" />
+      <rect x="102" y="201" width="16" height="10" rx="2" fill="#062238" opacity="0.55" />
+      <rect x="104" y="203" width="4" height="6" rx="1" fill="rgba(255,255,255,0.15)" />
 
       {finished && (
         <g className="done-stamp">
-          <rect x="48" y="188" width="124" height="36" rx="4" fill="rgba(28, 58, 24, 0.86)" />
+          <rect x="48" y="188" width="124" height="36" rx="4" fill="rgba(10, 60, 100, 0.92)" />
           <text
             x="110"
             y="212"
             textAnchor="middle"
-            fill="#d7e7c8"
+            fill="#d7ecff"
             fontFamily="IBM Plex Mono, monospace"
             fontSize="16"
             fontWeight="600"

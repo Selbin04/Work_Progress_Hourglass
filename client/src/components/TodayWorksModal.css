@@ -5,9 +5,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(10, 8, 6, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--overlay);
 }
 
 .today-works-card {
@@ -17,8 +15,8 @@
   padding: 24px 22px 20px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, #2f261e, #1a1511);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  background: linear-gradient(180deg, var(--panel-top), var(--panel));
+  box-shadow: none;
   scrollbar-width: none;
 }
 
@@ -76,7 +74,7 @@
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--surface-strong);
   color: var(--paper);
   text-align: left;
   cursor: pointer;
@@ -86,7 +84,7 @@
 
 .today-works-item.is-on {
   border-color: var(--brass);
-  background: rgba(212, 177, 90, 0.14);
+  background: var(--blue-soft);
 }
 
 .today-works-check {
@@ -99,7 +97,7 @@
   place-items: center;
   font-size: 12px;
   color: var(--ok);
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--surface-strong);
 }
 
 .today-works-item.is-on .today-works-check {
@@ -125,16 +123,28 @@
 
 .today-works-skip {
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--surface-strong);
   color: var(--paper);
 }
 
 .today-works-confirm {
   border: 1px solid var(--brass);
-  background: linear-gradient(180deg, rgba(212, 177, 90, 0.28), rgba(138, 100, 24, 0.35));
-  color: var(--paper);
+  background: linear-gradient(180deg, rgba(0, 176, 255, 0.55), rgba(0, 119, 194, 0.85));
+  color: #ffffff;
 }
 
 .today-works-confirm:hover {
-  background: linear-gradient(180deg, rgba(212, 177, 90, 0.4), rgba(138, 100, 24, 0.5));
+  background: linear-gradient(180deg, rgba(0, 176, 255, 0.7), rgba(0, 119, 194, 1));
+}
+
+[data-theme="light"] .today-works-card {
+  border-color: var(--line);
+  background: linear-gradient(180deg, var(--panel-top), var(--blue-soft));
+}
+
+[data-theme="light"] .today-works-item,
+[data-theme="light"] .today-works-check,
+[data-theme="light"] .today-works-skip {
+  background: var(--blue-soft-2);
+  border-color: var(--line);
 }

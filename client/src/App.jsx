@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import Navbar from "./components/Navbar.jsx";
 import Hourglass from "./components/Hourglass.jsx";
 import PourButton from "./components/PourButton.jsx";
 import ProjectPanel from "./components/ProjectPanel.jsx";
@@ -6,6 +7,7 @@ import DonePopup from "./components/DonePopup.jsx";
 import DailyReviewModal from "./components/DailyReviewModal.jsx";
 import SelectedStack from "./components/SelectedStack.jsx";
 import TodayWorksModal from "./components/TodayWorksModal.jsx";
+import SocialPage from "./components/SocialPage.jsx";
 import {
   createProject,
   deleteProject,
@@ -13,7 +15,7 @@ import {
   fetchProjects,
   updateProject,
 } from "./api.js";
-import { fillLabel, formatClock, projectDuration } from "./lib/time.js";
+import { projectDuration } from "./lib/time.js";
 import {
   applyDailyReviewForce,
   clearDailyWorkIds,
@@ -77,6 +79,7 @@ export default function App() {
   const [reviewIndex, setReviewIndex] = useState(0);
   const [selectedIds, setSelectedIds] = useState(() => loadDailySelectedIds());
   const [worksPickerId, setWorksPickerId] = useState(null);
+  const [page, setPage] = useState("progress");
   const reviewStartedRef = useRef(false);
 
   const pouringRef = useRef(false);
@@ -376,7 +379,6 @@ export default function App() {
     await saveCurrent(true);
   };
 
-  const remaining = Math.max(0, durationMs - elapsedMs);
   const progress = Math.min(1, elapsedMs / durationMs);
   const regularProjects = projects.filter((p) => !p.important);
   const importantProjects = projects
@@ -480,42 +482,48 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
-        <p className="eyebrow">Work progress hourglass</p>
-       
-        <p className="lede">
-         
-        </p>
-      </header>
+      <Navbar
+        storage={storage}
+        activeName={activeName}
+        page={page}
+        onNavigate={setPage}
+      />
 
+      {page === "social" ? (
+        <SocialPage />
+      ) : (
       <div className="layout">
         <div className="left-col">
-          <SelectedStack
-            projects={selectedProjects}
-            activeId={activeId}
-            onSelect={handleSelect}
-            onOpenTopics={(project, rect) => handleOpenTopics(project, rect, "today")}
-          />
-          <ProjectPanel
-            title="Projects"
-            projects={regularProjects}
-            activeId={activeId}
-            storage={storage}
-            showStorage
-            showCreate
-            newName={newName}
-            onNewName={setNewName}
-            onCreate={handleCreate}
-            onSelect={handleSelect}
-            onDelete={handleDelete}
-            onToggleImportant={handleToggleImportant}
-            importantAction="add"
-            emptyText="Create a project, pour as you work, then save another. Star a project to move it to Important. Double-click a project to list what work to do."
-            onOpenTopics={(project, rect) => handleOpenTopics(project, rect, "all")}
-          />
+          <div id="selected-panel">
+            <SelectedStack
+              projects={selectedProjects}
+              activeId={activeId}
+              onSelect={handleSelect}
+              onOpenTopics={(project, rect) => handleOpenTopics(project, rect, "today")}
+            />
+          </div>
+          <div id="projects-panel">
+            <ProjectPanel
+              title="Projects"
+              projects={regularProjects}
+              activeId={activeId}
+              storage={storage}
+              showStorage
+              showCreate
+              newName={newName}
+              onNewName={setNewName}
+              onCreate={handleCreate}
+              onSelect={handleSelect}
+              onDelete={handleDelete}
+              onToggleImportant={handleToggleImportant}
+              importantAction="add"
+              emptyText="Create a project, pour as you work, then save another. Star a project to move it to Important. Double-click a project to list what work to do."
+              onOpenTopics={(project, rect) => handleOpenTopics(project, rect, "all")}
+            />
+          </div>
         </div>
 
-        <main className="stage">
+        <main className="stage" id="stage">
           <p className="active-project">
             {activeName ? `Working on ${activeName}` : "No project yet — pour or save one"}
           </p>
@@ -536,23 +544,21 @@ export default function App() {
             />
           </div>
 
-          <div className="readout">
-            <div>
-              <span>Worked</span>
-              <strong>{formatClock(elapsedMs)}</strong>
+          <div className="progress-done">
+            <div className="progress-done-label">
+              <span>Done</span>
+              <strong>{Math.round(progress * 100)}%</strong>
             </div>
-            <div>
-              <span>Progress</span>
-              <strong>{fillLabel(elapsedMs, durationMs)}</strong>
+            <div
+              className="progress-track"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress * 100)}
+              aria-label="Progress done"
+            >
+              <div className="progress-fill" style={{ width: `${progress * 100}%` }} />
             </div>
-            <div>
-              <span>Left</span>
-              <strong>{formatClock(remaining)}</strong>
-            </div>
-          </div>
-
-          <div className="progress-track" aria-hidden="true">
-            <div className="progress-fill" style={{ width: `${progress * 100}%` }} />
           </div>
 
           <p className="status">
@@ -567,7 +573,7 @@ export default function App() {
           {apiError && <p className="api-error">{apiError}</p>}
         </main>
 
-        <div className="right-col">
+        <div className="right-col" id="important-panel">
           <ProjectPanel
             title="Important"
             projects={importantProjects}
@@ -582,6 +588,7 @@ export default function App() {
           />
         </div>
       </div>
+      )}
       {worksPickerProject && (
         <TodayWorksModal
           project={worksPickerProject}

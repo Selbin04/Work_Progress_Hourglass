@@ -1,0 +1,136 @@
+.social-page {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 12px 0 48px;
+}
+
+.social-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.social-tabs button {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 10px 14px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 10px;
+}
+
+.social-tabs button:hover {
+  color: var(--paper);
+  border-color: var(--brass);
+}
+
+.social-tabs button.is-active {
+  color: var(--brass);
+  background: var(--blue-soft);
+  border-color: var(--brass);
+  font-weight: 600;
+}
+
+.social-feed,
+.social-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.social-card {
+  padding: 16px 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.social-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.social-card-top strong {
+  display: block;
+  font-size: 14px;
+  color: var(--paper);
+}
+
+.social-meta {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.social-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--chip-on-fg);
+  background: var(--brass-deep);
+  border: 2px solid var(--brass);
+}
+
+.social-avatar-group {
+  border-radius: 10px;
+  background: var(--blue-soft-3);
+}
+
+.social-card > p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--paper);
+}
+
+.social-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.social-actions button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.social-actions button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.social-actions button:hover {
+  color: var(--brass);
+  background: var(--blue-soft);
+}
+
+.social-actions button.is-liked {
+  color: var(--brass);
+}
+
+.social-actions button.is-report:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
